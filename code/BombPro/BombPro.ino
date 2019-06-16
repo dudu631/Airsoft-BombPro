@@ -1,75 +1,48 @@
 #include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
-//#include <LiquidCrystal_I2C.h>
-#include <LiquidCrystal.h>
-/*
- Arduino Bomb Pro
- 
- The circuit:
- * More info at : http://yin.mainstreamds.com/
- If you need some help mail me to yinbot@gmail.com
- 
- created 4,Sep, 2010
- Modified 24 May 2014
- by Ignacio Lillo
- 
- */
 
-//LiquidCrystal_I2C lcd(0x38,16,2);
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
-const byte ROWS = 4; //four rows
-const byte COLS = 4; //three columns
+LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7,3,POSITIVE);
+
+const byte ROWS = 4;
+const byte COLS = 4; 
 char keys[ROWS][COLS] = {
-  {
-    '1','2','3','a'                          }
-  ,
-  {
-    '4','5','6','b'                          }
-  ,
-  {
-    '7','8','9','c'                          }
-  ,
-  {
-    '*','0','#','d'                          }
+  {'1','2','3','a'},
+  {'4','5','6','b'},
+  {'7','8','9','c'},
+  {'*','0','#','d'}
 };
-
-byte rowPins[ROWS] = {
-  A4, A5, 13, 12}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {
-  A0, A1, A2, A3
-}; //connect to the column pinouts of the keypad
+byte rowPins[ROWS] = {A0, A1, A2, A3}; 
+byte colPins[COLS] = {3, 2, 4, 5}; 
 
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
 
 char enteredText[8];
-byte time[4];
-byte refresh=0;//1 if is refreshed once time...
 char password[8];
 int key=-1;
 char lastKey;
 char var;
 boolean passwordEnable=false;
 
-//Buttons for lcd shield
+
 char BT_RIGHT = '4';
 char BT_UP = 'a';
 char BT_DOWN = 'b';
 char BT_LEFT = '6';
-char BT_SEL = 'd';   // Ok key  
+char BT_SEL = 'd';   
 char BT_CANCEL = 'c';
 char BT_DEFUSER = 'x';   // not implemented
 
 //leds
 
-const int REDLED = 11;
-const int GREENLED = 10;
-//const int BLUELED = 12;
-//mosfet
+const int REDLED = 9;
+const int GREENLED = 11;
+
 boolean mosfetEnable = false;
 const int mosfet = 9;
 //IS VERY IMPORTANT THAT YOU TEST THIS TIME. BY DEFAULT IS IN 1 SEC. THAT IS NOT TOO MUCH. SO TEST IT!
-const int MOSFET_TIME = 5000;
+const int MOSFET_TIME = 15000;
 
 //TIME INTS
 int GAMEHOURS = 0;
@@ -87,7 +60,7 @@ boolean defuseando;
 boolean cancelando;
 // SOUND TONES
 boolean soundEnable = true;
-int tonepin = 8; // Pin 13 for the sound
+int tonepin = 8; 
 int tonoPitido = 3000;
 int tonoAlarma1 = 700;
 int tonoAlarma2 = 2600;
@@ -98,29 +71,27 @@ unsigned long iTime;
 unsigned long timeCalcVar;
 unsigned long redTime;
 unsigned long greenTime;
-unsigned long iZoneTime;//initial time for zone
-byte team=0; // 0 = neutral, 1 = green team, 2 = red team
+unsigned long iZoneTime;
+byte team=0;
 
 void setup(){
-  lcd.begin(16, 2);
+  lcd.begin(16,2); 
+  lcd.backlight();
   Serial.begin(9600);
-  //  lcd.init();                      // initialize the lcd 
+  //  lcd.init();                      
   //  lcd.backlight();
-  lcd.setCursor(3,0);
-  tone(tonepin,2400,30);
-  lcd.print("IGNIS ONE");// you can add your team name or someting cool
-  lcd.setCursor(0,1);
-  lcd.print(" AIRSOFT SYSTEM");// you can add your team name or someting cool
+  lcd.setCursor(2,0);
+  lcd.print(" R E B O R N");
+  lcd.setCursor(1,1);
+  lcd.print(" A I R S O F T");
   keypad.setHoldTime(50);
   keypad.setDebounceTime(50);
   keypad.addEventListener(keypadEvent);
-  delay(2000);
+  delay(3000); 
   pinMode(GREENLED, OUTPUT);     
-//  pinMode(8, OUTPUT);  
-//  digitalWrite(8,HIGH);
   pinMode(REDLED, OUTPUT); 
   pinMode(mosfet, OUTPUT);  
-  // CONFIGURE THE BARS OF PROGRESS BAR
+  // 
   byte bar1[8] = {
     B10000,
     B10000,
@@ -212,20 +183,20 @@ void keypadEvent(KeypadEvent key){
     case RELEASED:
       switch (key){
          case 'd': defuseando= false;
-         //Serial.println("d Releases");
+         Serial.println("d Releases");
          break;
          case 'c': cancelando=false;
-         //Serial.println("c Releases");
+         Serial.println("c Releases");
          break;
       }
     break;
     case HOLD:
       switch (key){
         case 'd': defuseando= true;
-        //Serial.println("d hold");
+        Serial.println("d hold");
         break;
         case 'c': cancelando=true;
-        //Serial.println("c hold");
+        Serial.println("c hold");
         break;
       }
     break;
@@ -238,27 +209,27 @@ void disarmedSplash(){
   digitalWrite(GREENLED, LOW);
   if(sdStatus || saStatus){
     lcd.clear();
-    lcd.setCursor(2,0);
-    lcd.print("BOMB DISARMED");
-    lcd.setCursor(3,1);
-    lcd.print("GOODS WIN");
-    digitalWrite(GREENLED, HIGH);  
+    lcd.setCursor(0,0);
+    lcd.print("BOMBA DESARMADA");
+    lcd.setCursor(0,1);
+    lcd.print(" PARABENS ");
+    digitalWrite(GREENLED, LOW);  
     delay(5000);
-    digitalWrite(GREENLED, LOW); 
+    digitalWrite(GREENLED, HIGH); 
   }
   //end code
   lcd.clear();
-  lcd.print("Play Again?");
+  lcd.print("Jogar outra vez?");
   lcd.setCursor(0,1);
-  lcd.print("A : Yes B : No");
-  digitalWrite(REDLED, LOW);  
-  digitalWrite(GREENLED, LOW); 
+  lcd.print("A: SIM  B: NAO");
+  digitalWrite(REDLED, HIGH);  
+  digitalWrite(GREENLED, HIGH); 
   while(1)
   {
     var = keypad.waitForKey();
     if(var == 'a' ){
       tone(tonepin,2400,30);
-      //We have two options, search & destroy and sabotaje play again options so!
+      //
       if(sdStatus){
         startGameCount();
         search();
@@ -266,7 +237,7 @@ void disarmedSplash(){
       if(saStatus){
         saStatus=true;
         startGameCount();
-        start=true; //to set iTime to actual millis() :D
+        start=true; //
         sabotage();
       }
     }  
@@ -279,16 +250,16 @@ void disarmedSplash(){
 }
 
 void explodeSplash(){
-  digitalWrite(REDLED, LOW);  
-  digitalWrite(GREENLED, LOW); 
+  digitalWrite(REDLED, HIGH);  
+  digitalWrite(GREENLED, HIGH); 
   cls();
   delay(100);
   endGame = false;
   lcd.setCursor(1,0);
-  lcd.print("TERRORISTS WIN");
-  lcd.setCursor(4,1);
-  lcd.print("GAME OVER");
-  for(int i = 200; i>0; i--)// this is the ultra hi definition explosion sound xD
+  lcd.print("TERRORISTAS WIN");
+  lcd.setCursor(0,1);
+  lcd.print("  FIM DE JOGO");
+  for(int i = 200; i>0; i--)// 
   {
     tone(tonepin,i);
     delay(20);
@@ -301,15 +272,15 @@ void explodeSplash(){
   cls();
 
   //end code
-  lcd.print("Play Again?");
+  lcd.print("Jogar outra vez?");
   lcd.setCursor(0,1);
-  lcd.print("A : Yes B : No");
+  lcd.print("A: SIM  B: NAO");
   while(1)
   {
     var = keypad.waitForKey();
     if(var == 'a' ){
       tone(tonepin,2400,30);
-      //We have two options, search & destroy and sabotaje play again options so!
+      //
       if(sdStatus){
         startGameCount();
         search();
@@ -317,7 +288,7 @@ void explodeSplash(){
       if(saStatus){
         saStatus=true;
         startGameCount();
-        start=true; //to set iTime to actual millis() :D
+        start=true; //
         sabotage();
       }
     }  
@@ -329,4 +300,3 @@ void explodeSplash(){
     }  
   } 
 }
-

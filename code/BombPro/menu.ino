@@ -2,17 +2,13 @@
 
 void menuPrincipal(){   //MAIN MENU
 
-  digitalWrite(GREENLED, LOW); 
-  digitalWrite(REDLED, LOW); 
-
-  //   if whe start a new game from another we need to restart propertly this variables
-  saStatus=false;
-  sdStatus=false;
-  doStatus=false;
+  digitalWrite(GREENLED, HIGH); 
+ digitalWrite(REDLED, HIGH); 
   //Draw menu
   cls();//clear lcd and set cursor to 0,0
   int i=0;
- // HERE YOU CAN ADD MORE ITEMS ON THE MAIN MENU
+  char* menu1[]={
+    "Search&Destroy","Sabotage","Domination", "Bomb Setup"        }; // HERE YOU CAN ADD MORE ITEMS ON THE MAIN MENU
   lcd.print(menu1[i]);
   lcd.setCursor(15,1);
   checkArrows(i,2);
@@ -24,16 +20,17 @@ void menuPrincipal(){   //MAIN MENU
       i--;
       cls();
       lcd.print(menu1[i]);
-      checkArrows(i,2);
-      delay(50);
+      checkArrows(i,3);
+      delay(100);
     }
-    if(var == BT_DOWN && i<2){
+    if(var == BT_DOWN && i<3){
       tone(tonepin,2400,30);
       i++;
       cls(); 
       lcd.print(menu1[i]);    
-      checkArrows(i,2);
-      delay(50);
+      checkArrows(i,3);
+      delay(100);
+
     }
 
     if(var == BT_SEL){
@@ -54,7 +51,6 @@ void menuPrincipal(){   //MAIN MENU
         sabotage();
         break;
       case 2:
-
         doStatus=true;
         configQuickGame();
         startGameCount();
@@ -63,7 +59,8 @@ void menuPrincipal(){   //MAIN MENU
       case 3:
         config();
         break;
-
+        
+       
       }
     }
   }
@@ -74,7 +71,8 @@ void config(){
   lcd.clear();
   lcd.setCursor(0, 0);
   int i=0;
-  
+  char* menu2[]={
+    "Game Config","OFF Time TEST", "RELE Test 3 sec.","...vazio..."}; // HERE YOU CAN ADD MORE ITEMS ON THE MENU
   delay(500);
   lcd.print(menu2[i]);
   checkArrows(i,3);
@@ -108,20 +106,49 @@ void config(){
       switch (i){
 
       case 0:
-        //gameConfigMenu();
+        //gameConfigMenu
+        lcd.print("No config menu!");
+        delay(2000);
+        config();
         break;
 
       case 1:
-        //soundConfigMenu();
+        //final time test menu
+        lcd.print("Final time sound");
+
+        digitalWrite(mosfet, HIGH);
+        delay(300);
+        digitalWrite(mosfet, LOW);
+        delay(1000);
+        digitalWrite(mosfet, HIGH);
+        delay(300);
+        digitalWrite(mosfet, LOW);
+        delay(1000);
+        digitalWrite(mosfet, HIGH);
+        delay(300);
+        digitalWrite(mosfet, LOW);
+        delay(1000);
+        digitalWrite(mosfet, HIGH);
+        delay(200);
+        digitalWrite(mosfet, LOW);
+        delay(100);
+        digitalWrite(mosfet, HIGH);
+        delay(200);
+        digitalWrite(mosfet, LOW);
+        delay(100);
+
+
+        config();
         break;
 
       case 2:
+      //test rele menu
         cls();
-        lcd.print("Mosfet ON!");
+        lcd.print("RELE ON!");
         digitalWrite(mosfet, HIGH);   // turn the LED on (HIGH is the voltage level)
-        delay(4000);   // wait for 4 second
+        delay(3000);   // wait for 3 second
         cls();
-        lcd.print("Mosfet OFF!");
+        lcd.print("RELE OFF!");
         digitalWrite(mosfet, LOW);
         delay(2000);
         config();
@@ -137,160 +164,127 @@ void configQuickGame(){
   cls();
   //GAME TIME
   if(sdStatus || doStatus || saStatus){
-    menu1:
-    cls();
-    lcd.print(GAME_TIME);
-    delay(100);
+    lcd.print("Game Time:");
     lcd.setCursor(0,1);
-    lcd.print("00:00 hh:mm");
-    lcd.cursor();
-    lcd.blink();
-    lcd.setCursor(0,1);
-    byte var2=0;
-    for(int i=0;i<4;i++){ 
-      while(1){
-        if(i==2 && var2==0){
-          lcd.print(":");
-          var2=1;
-        }
+    checkArrows(1,2);
+    delay(400);
 
-        byte varu= getRealNumber();
-        if(varu !=11){
-
-          time[i] =  varu;
-          Serial.print(varu);
-
-
-          lcd.print(varu);
-          tone(tonepin,2400,30);
-
-          break;
-        }
-      }  
-    }
-    lcd.noCursor();
-    lcd.noBlink();
-    lcd.setCursor(13,1);
-    lcd.print("ok?");
-    //zona donde pasamos los items a
-    //redibujar
     while(1){
+
+
+      lcd.setCursor(0,1);  
+      lcd.print(GAMEMINUTES);  
+      lcd.print("   Minutos");
+
       var = keypad.waitForKey();
+
+      if(var == 'a' && GAMEMINUTES<180){
+        tone(tonepin,2400,30);
+        GAMEMINUTES++;
+        delay(50);
+      }
+      if(var == 'b' && GAMEMINUTES>1){
+        tone(tonepin,2400,30);
+        GAMEMINUTES--;
+        delay(50);
+      }
+      if(var == 'c') // Cancel or Back Button :')
+      {
+        tone(tonepin,2400,30);
+        menuPrincipal();
+      } 
       if(var == 'd') // Cancel or Back Button :')
       {
         tone(tonepin,2400,30);
-        GAMEMINUTES= ((time[0]*600)+(time[1]*60)+(time[2]*10)+(time[3]));
         break;
-      }    
-  if(var == 'c') // Cancel or Back Button :')
-      {
-        tone(tonepin,2400,30);
-        goto menu1;
-      }           
+      }        
     }
     tone(tonepin,2400,30);
     cls();
   }
   //BOMB TIME
   if(sdStatus || saStatus){
- 
-    menu2:
-    cls();
-    lcd.print(BOMB_TIME);
-    delay(100);
+    lcd.print("Bomb Time:");
     lcd.setCursor(0,1);
-    lcd.print(ZERO_MINUTES);
-    lcd.cursor();
-    lcd.blink();
-    lcd.setCursor(0,1);
-    for(int i=0;i<2;i++){ 
-      while(1){
-        byte varu= getRealNumber();
-        if(varu !=11){
-          time[i] =  varu;
-          lcd.print(varu);
-          tone(tonepin,2400,30);
-          break;
-        }
-      }  
-    }
-    lcd.noCursor();
-    lcd.noBlink();   
-    lcd.setCursor(13,1);
-    lcd.print("ok?");
-    //zona donde pasamos los items a
-    //redibujar
+    checkArrows(1,2);
+    delay(400);
+
     while(1){
+      lcd.setCursor(0,1);  
+      lcd.print(BOMBMINUTES);  
+      lcd.print(" Minutos");
       var = keypad.waitForKey();
+
+
+      if(var == 'b' && BOMBMINUTES>1){
+        tone(tonepin,2400,30);
+        BOMBMINUTES--;
+        delay(50);
+      }
+      if(var == 'a' && BOMBMINUTES<20){
+        tone(tonepin,2400,30);
+        BOMBMINUTES++;
+        delay(50);
+      }
+      if(var == 'c') // Cancel or Back Button :')
+      {
+        tone(tonepin,2400,30);
+        menuPrincipal();
+      } 
       if(var == 'd') // Cancel or Back Button :')
       {
         tone(tonepin,2400,30);
-        BOMBMINUTES= ((time[0]*10)+(time[1]));
         break;
-      }    
-  if(var == 'c') // Cancel or Back Button :')
-      {
-        tone(tonepin,2400,30);
-        goto menu2;
-      }           
+      }          
     }
     tone(tonepin,2400,30);
-    cls();
   }
   cls();
   //ARMING TIME
   if(sdStatus || doStatus || saStatus){
-        
-    menu3:
-    cls();
-    lcd.print(ARM_TIME);
-    delay(100);
+    lcd.print("Arm time:");
     lcd.setCursor(0,1);
-    lcd.print(ZERO_SECS);
-    lcd.cursor();
-    lcd.blink();
-    lcd.setCursor(0,1);
-    for(int i=0;i<2;i++){ 
-      while(1){
-        byte varu= getRealNumber();
-        if(varu !=11){
-          time[i] =  varu;
-          lcd.print(varu);
-          tone(tonepin,2400,30);
-          break;
-        }
-      }  
-    }
-    lcd.noCursor();
-    lcd.noBlink(); 
-    lcd.setCursor(13,1);
-    lcd.print("ok?");  
-    
-    //zona donde pasamos los items a
-    //redibujar
+    checkArrows(1,2);
+    delay(400);
+
     while(1){
+      lcd.setCursor(0,1);  
+      lcd.print(ACTIVATESECONDS);  
+      lcd.print(" segundos");
       var = keypad.waitForKey();
+      
+      if(var == 'b' && ACTIVATESECONDS>5){
+        tone(tonepin,2400,30);
+        ACTIVATESECONDS--;
+        delay(50);
+      }   
+      if(var == 'a' && ACTIVATESECONDS<30){
+        ACTIVATESECONDS++;
+        tone(tonepin,2400,30);
+        delay(50);
+      }
+      if(var == 'c') // Cancel or Back Button :')
+      {
+        tone(tonepin,2400,30);
+        menuPrincipal();
+      } 
       if(var == 'd') // Cancel or Back Button :')
       {
         tone(tonepin,2400,30);
-        ACTIVATESECONDS= ((time[0]*10)+(time[1]));
         break;
-      }    
-  if(var == 'c') // Cancel or Back Button :')
-      {
-        tone(tonepin,2400,30);
-        goto menu3;
-      }           
+      }     
     }
     tone(tonepin,2400,30);
-    cls();
+    ACTIVATESECONDS-=1; // Just a fix
+
   }
   //Want sound??
   if(sdStatus || saStatus || doStatus){
     cls();
-    lcd.print(ENABLE_SOUND);
-    lcd.setCursor(0,1);
-    lcd.print(YES_OR_NOT);
+  lcd.print("Ativar som?");
+  lcd.setCursor(0,1);
+  lcd.print("A: SIM  B: NAO");
+
 
     while(1)
     {
@@ -312,9 +306,9 @@ void configQuickGame(){
 
   if(sdStatus || saStatus){
     cls();
-    lcd.print(ENABLE_MOSFET);
+    lcd.print("Ativar Rele?");
     lcd.setCursor(0,1);
-    lcd.print(YES_OR_NOT);
+    lcd.print("A: SIM  B: NO");
     while(1)
     {
       var = keypad.waitForKey();
@@ -333,9 +327,9 @@ void configQuickGame(){
   //You Want a password enable-disable game?
   if(sdStatus || saStatus){
     cls();
-    lcd.print(ENABLE_CODE);
+    lcd.print("Colocar Senha?");
     lcd.setCursor(0,1);
-    lcd.print(YES_OR_NOT);
+    lcd.print("A: SIM  B: NAO");
 
     while(1)
     {
@@ -356,9 +350,3 @@ void configQuickGame(){
   }  
   //Continue the game :D
 }
-
-
-
-
-
-

@@ -1,8 +1,8 @@
 
 void sabotage(){
   cls();
-  digitalWrite(REDLED, LOW); 
-  digitalWrite(GREENLED, LOW);   
+  digitalWrite(REDLED, HIGH); 
+  digitalWrite(GREENLED, HIGH);   
   //SETUP INITIAL TIME 
   int minutos = GAMEMINUTES-1;
 
@@ -21,15 +21,15 @@ void sabotage(){
     timeCalcVar=(millis()- iTime)%1000;
     if(timeCalcVar >= 0 && timeCalcVar <= 50)
     {
-      digitalWrite(GREENLED, HIGH);  
+      digitalWrite(GREENLED, LOW);  
     }
     if(timeCalcVar >= 90 && timeCalcVar <= 130)
     {    
-      digitalWrite(GREENLED, LOW);  
+      digitalWrite(GREENLED, HIGH);  
     }
 
     lcd.setCursor(3,0);
-    lcd.print(GAME_TIME);
+    lcd.print("GAME TIME");
     aTime=millis()- iTime;
     lcd.setCursor(3,1);
 
@@ -44,9 +44,9 @@ void sabotage(){
     {
       lcd.clear();
       while(1){
-        lcd.print(GAME_OVER);
+        lcd.print(" GAME OVER! ");
         lcd.setCursor(0,1);
-        lcd.print(DEFENDERS_WIN);  
+        lcd.print(" DEFENDERS WIN ");  
 
         for(int i = 1000; i>200; i--){
           if(soundEnable)tone(tonepin,i);
@@ -62,11 +62,11 @@ void sabotage(){
     if('d' == keypad.getKey() && passwordEnable){
       lcd.clear();
       lcd.setCursor(2,0);      
-      lcd.print(ARMING_BOMB);
+      lcd.print("ARMING BOMB");
       delay(1000);//a little delay to think in the password
       lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(ENTER_CODE);
+      lcd.setCursor(3, 0);
+      lcd.print("Enter Code");
 
       setCode();// we need to set the compare variable first
 
@@ -77,7 +77,7 @@ void sabotage(){
       }        
       lcd.clear();
       lcd.setCursor(2,0);
-      lcd.print(CODE_ERROR);
+      lcd.print("Code Error!");
       if(soundEnable)tone(tonepin,errorTone,200);
       delay(500);
       cls();
@@ -88,10 +88,10 @@ void sabotage(){
     {
       keypad.getKey();
       cls();
-      digitalWrite(GREENLED, LOW);
+      digitalWrite(GREENLED, HIGH);
       lcd.clear();
       lcd.setCursor(2,0);
-      lcd.print(ARMING_BOMB);
+      lcd.print("ARMING BOMB");
       lcd.setCursor(0,1);
       unsigned int percent=0;
       unsigned long xTime=millis(); //start disabling time
@@ -102,13 +102,13 @@ void sabotage(){
 
         if( timeCalcVar >= 0 && timeCalcVar <= 40)
         {
-          digitalWrite(REDLED, HIGH);  
+          digitalWrite(REDLED, LOW);  
           if(soundEnable)tone(tonepin,tonoAlarma1,200);
         }
         if(timeCalcVar >= 480 && timeCalcVar <= 520)
         {
           if(soundEnable)tone(tonepin,tonoAlarma2,200);
-          digitalWrite(REDLED, LOW);
+          digitalWrite(REDLED, HIGH);
         }
         unsigned long seconds= millis() - xTime;
         percent = (seconds)/(ACTIVATESECONDS*10);
@@ -116,12 +116,12 @@ void sabotage(){
 
         if(percent >= 100)
         {
-          digitalWrite(GREENLED, LOW);
+          digitalWrite(GREENLED, HIGH);
           destroySabotage();// jump to the next gamemode
         }
       }
       cls();
-      digitalWrite(REDLED, LOW);  
+      digitalWrite(REDLED, HIGH);  
     }
   }
 }
@@ -129,7 +129,7 @@ void sabotage(){
 void destroySabotage(){
   lcd.clear();
   lcd.setCursor(3,0);
-  lcd.print(BOMB_ARMED);
+  lcd.print("BOMB ARMED");
   delay(1000);
   int minutos=BOMBMINUTES-1;
   unsigned long iTime=millis();
@@ -149,11 +149,11 @@ void destroySabotage(){
     timeCalcVar=(millis()- iTime)%1000;
     if(timeCalcVar >= 0 && timeCalcVar <= 40)
     {
-      digitalWrite(REDLED, HIGH);  
+      digitalWrite(REDLED, LOW);  
       if(soundEnable)tone(tonepin,tonoActivada,largoTono);
     }
     if(timeCalcVar >= 180 && timeCalcVar <= 220){
-      digitalWrite(REDLED, LOW);  
+      digitalWrite(REDLED, HIGH);  
     }
     //Sound 
 
@@ -165,7 +165,7 @@ void destroySabotage(){
     if( minutos-aTime/60000==0 && 59-((aTime/1000)%60) < 10)largoTono = 300;
 
     lcd.setCursor(1,0);
-    lcd.print(DETONATION_IN);
+    lcd.print("DETONATION IN");
     //Passed Time
     
     lcd.setCursor(3,1);
@@ -187,14 +187,14 @@ void destroySabotage(){
     if('d' == keypad.getKey() && passwordEnable){
 
       cls();
-      digitalWrite(REDLED, LOW);  
-      digitalWrite(GREENLED, HIGH); 
-      lcd.print(DISARMING);
+      digitalWrite(REDLED, HIGH);  
+      digitalWrite(GREENLED, LOW); 
+      lcd.print(" DISARMING BOMB");
       delay(1000);//a little delay to think in the password
 
       lcd.clear();
-      lcd.setCursor(0,0);
-      lcd.print(ENTER_CODE);
+      lcd.setCursor(3,0);
+      lcd.print("Enter Code");
 
       setCode();// we need to set the compare variable first
 
@@ -205,7 +205,7 @@ void destroySabotage(){
       }        
       lcd.clear();
       lcd.setCursor(2,0);
-      lcd.print(CODE_ERROR);
+      lcd.print("Code Error!");
       if(soundEnable)tone(tonepin,errorTone,200);
       delay(500);
       cls();
@@ -214,9 +214,9 @@ void destroySabotage(){
     if(defuseando && !passwordEnable)// disarming bomb
     {
       lcd.clear();
-      digitalWrite(REDLED, LOW);
+      digitalWrite(REDLED, HIGH);
       lcd.setCursor(3,0);
-      lcd.print(DISARM);
+      lcd.print("DISARMING");
       lcd.setCursor(0,1);
       unsigned int percent=0;
       unsigned long xTime=millis();
@@ -231,13 +231,13 @@ void destroySabotage(){
         timeCalcVar=(millis()- xTime)%1000;
         if(timeCalcVar>= 0 && timeCalcVar <= 20)
         {
-          digitalWrite(GREENLED, HIGH);  
+          digitalWrite(GREENLED, LOW);  
           if(soundEnable)tone(tonepin,tonoAlarma1,200);
         }
         if(timeCalcVar >= 480 && timeCalcVar <= 500)
         {
           if(soundEnable)tone(tonepin,tonoAlarma2,200);
-          digitalWrite(GREENLED, LOW);  
+          digitalWrite(GREENLED, HIGH);  
         }
         unsigned long seconds=(millis()- xTime);
         percent= seconds/(ACTIVATESECONDS*10);
@@ -249,8 +249,8 @@ void destroySabotage(){
           sabotage();   
         }
       }
-      digitalWrite(REDLED, LOW); 
-      digitalWrite(GREENLED, LOW);
+      digitalWrite(REDLED, HIGH); 
+      digitalWrite(GREENLED, HIGH);
       cls(); 
     }
   }
@@ -267,4 +267,5 @@ void destroySabotage(){
   
   
   
+
 

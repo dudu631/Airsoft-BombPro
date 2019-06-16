@@ -1,5 +1,6 @@
 void drawPorcent(byte porcent){
   //TODO: Optimize this code 
+  byte i=1;
   int aDibujar=(8*porcent)/10;
   lcd.setCursor(0,1);
 
@@ -55,55 +56,26 @@ void cls(){
 }
 
 void printTime(unsigned long minutos, unsigned long aTiempo){
-
-  timeCalcVar=(minutos-aTiempo/60000);
-  //Hours
-  
-  if(timeCalcVar/60<1 && refresh==0){
-      lcd.clear();
-      refresh=1;
-      delay(100);
-      lcd.setCursor(3,1);
-  }
-   
-  if(timeCalcVar/60>=1){
-    
-    if(timeCalcVar/60<10)
-  {
-    
-    lcd.setCursor(2,1);
-    lcd.print("0");
-    lcd.print(timeCalcVar/60);
-  }
-  else
-  {
-    lcd.print(timeCalcVar/60);
-  }
-  
-  lcd.print(":");
-  
-  }
   //minutes
-  if((timeCalcVar%60)<10)
+  if((minutos-aTiempo/60000)<10)
   {
     lcd.print("0");
-    lcd.print(timeCalcVar%60);
+    lcd.print(minutos-aTiempo/60000);
   }
   else
   {
-    lcd.print(timeCalcVar%60);
+    lcd.print(minutos-aTiempo/60000);
   }
   lcd.print(":");
   //seconds
-  timeCalcVar=(aTiempo/1000);
-  if((59-(timeCalcVar%60))<10)
+  if((59-((aTiempo/1000)%60))<10)
   {
     lcd.print("0");
-    lcd.print(59-(timeCalcVar%60));
+    lcd.print(59-((aTiempo/1000)%60));
   }
   else
   {
-    lcd.print(59-(timeCalcVar%60));
+    lcd.print(59-((aTiempo/1000)%60));
   }
   lcd.print(":");
   //this not mach with real time, is just a effect, it says 999 because millis%1000 sometimes give 0 LOL
@@ -146,7 +118,7 @@ void startGameCount(){
   lcd.setCursor(1,0);
   lcd.print("Ready to Begin");
   lcd.setCursor(0,1);
-  lcd.print("Push ANY Button");
+  lcd.print(".Aperte um Botao.");
   keypad.waitForKey();//if you press a button game start
 
   cls();
@@ -189,5 +161,3 @@ void activateMosfet(){
   digitalWrite(mosfet, LOW);
 
 }
-
-

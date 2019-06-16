@@ -1,7 +1,7 @@
 void search(){
   cls();
-  digitalWrite(REDLED, LOW); 
-  digitalWrite(GREENLED, LOW);   
+  digitalWrite(REDLED, HIGH); 
+  digitalWrite(GREENLED, HIGH);   
   //SETUP INITIAL TIME 
   int minutos = GAMEMINUTES-1;
   unsigned long iTime=millis(); //  initialTime in millisec 
@@ -10,25 +10,19 @@ void search(){
 
   //Starting Game Code
   while(1){  // this is the important code, is a little messy but works good.
-
-    //If you fail disarm. 
-    if(endGame){
-      endSplash();
-    }
-
     //Code for led blinking
     timeCalcVar=(millis()- iTime)%1000;
     if(timeCalcVar >= 0 && timeCalcVar <= 50)
     {
-      digitalWrite(GREENLED, HIGH);  
+      digitalWrite(GREENLED, LOW);  
     }
     if(timeCalcVar >= 90 && timeCalcVar <= 130)
     {    
-      digitalWrite(GREENLED, LOW);  
+      digitalWrite(GREENLED, HIGH);  
     }
 
-    lcd.setCursor(3,0);
-    lcd.print(GAME_TIME_TOP);
+    lcd.setCursor(0,0);
+    lcd.print("TIEMPO de JUEGO");
     aTime=millis()- iTime;
     lcd.setCursor(3,1);
 
@@ -41,20 +35,56 @@ void search(){
     //Check If Game End
     if(minutos-aTime/60000==0 && 59-((aTime/1000)%60)==0)
     {
-      endSplash();
+      lcd.clear();
+      while(1){
+        lcd.print("FIN DEL TIEMPO!");
+        lcd.setCursor(0,1);
+        lcd.print("DEFENSORES WIN ");  
+
+        digitalWrite(mosfet, HIGH);
+        delay(300);
+        digitalWrite(mosfet, LOW);
+        delay(1000);
+        digitalWrite(mosfet, HIGH);
+        delay(300);
+        digitalWrite(mosfet, LOW);
+        delay(1000);
+        digitalWrite(mosfet, HIGH);
+        delay(300);
+        digitalWrite(mosfet, LOW);
+        delay(1000);
+        digitalWrite(mosfet, HIGH);
+        delay(200);
+        digitalWrite(mosfet, LOW);
+        delay(100);
+        digitalWrite(mosfet, HIGH);
+        delay(200);
+        digitalWrite(mosfet, LOW);
+        delay(100);
+
+
+        for(int i = 1000; i>200; i--){
+          if(soundEnable)tone(tonepin,i);
+          delay(5);
+        }
+        noTone(tonepin);
+        delay(5000);
+        cls();
+        menuPrincipal();
+      }
     }
     //Serial.println(keypad.getKey());
     //USED IN PASSWORD GAME 
     if('d' == keypad.getKey() && passwordEnable){
       lcd.clear();
-      lcd.setCursor(2, 0);
-      lcd.print(ARMING_BOMB);
+      lcd.setCursor(0, 0);
+      lcd.print("ARMANDO BOMBA");
       delay(1000);//a little delay to think in the password
       lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(ENTER_CODE);
+      lcd.setCursor(3, 0);
+      lcd.print("Enter Code");
 
-      setCodeTime();// we need to set the comparation variable first it writes on enteredText[]
+      setCode();// we need to set the comparation variable first it writes on enteredText[]
 
       //then compare :D
 
@@ -63,7 +93,7 @@ void search(){
       }        
       lcd.clear();
       lcd.setCursor(3,0);
-      lcd.print(CODE_ERROR);
+      lcd.print("Code Error!");
       if(soundEnable)tone(tonepin,errorTone,200);
       delay(500);
       cls();
@@ -71,10 +101,10 @@ void search(){
     //Check If Is Activating
     while(defuseando && !passwordEnable)
     {
-      digitalWrite(GREENLED, LOW);
+      digitalWrite(GREENLED, HIGH);
       lcd.clear();
-      lcd.setCursor(2,0);
-      lcd.print(ARMING_BOMB);
+      lcd.setCursor(0,0);
+      lcd.print(" ARMANDO BOMBA");
       lcd.setCursor(0,1);
       unsigned int percent=0;
       unsigned long xTime=millis(); //start disabling time
@@ -85,7 +115,7 @@ void search(){
 
         if( timeCalcVar >= 0 && timeCalcVar <= 40)
         {
-          digitalWrite(REDLED, HIGH);  
+          digitalWrite(REDLED, LOW);  
           if(soundEnable)tone(tonepin,tonoAlarma1,200);
         }
         if(timeCalcVar >= 480 && timeCalcVar <= 520)
@@ -100,12 +130,12 @@ void search(){
 
         if(percent >= 100)
         {
-          digitalWrite(GREENLED, LOW);
+          digitalWrite(GREENLED, HIGH);
           destroy();// jump to the next gamemode
         }
       }
       cls();
-      digitalWrite(REDLED, LOW);  
+      digitalWrite(REDLED, HIGH);  
 
     }
   }
@@ -113,8 +143,8 @@ void search(){
 
 void destroy(){
   lcd.clear();
-  lcd.setCursor(3,0);
-  lcd.print(BOMB_ARMED);
+  lcd.setCursor(0,0);
+  lcd.print(" BOMBA ARMADA");
   delay(1000);
   int minutos=BOMBMINUTES-1;
   unsigned long iTime=millis();
@@ -123,7 +153,7 @@ void destroy(){
 
   //MAIN LOOP
   while(1){
-
+    
     //If you fail disarm. 
     if(endGame){
       explodeSplash();
@@ -134,11 +164,11 @@ void destroy(){
     timeCalcVar=(millis()- iTime)%1000;
     if(timeCalcVar >= 0 && timeCalcVar <= 40)
     {
-      digitalWrite(REDLED, HIGH);  
+      digitalWrite(REDLED, LOW);  
       if(soundEnable)tone(tonepin,tonoActivada,largoTono);
     }
     if(timeCalcVar >= 180 && timeCalcVar <= 220){
-      digitalWrite(REDLED, LOW);  
+      digitalWrite(REDLED, HIGH);  
     }
     //Sound 
     aTime= millis()- iTime;
@@ -148,10 +178,10 @@ void destroy(){
     if(timeCalcVar >= 745 && timeCalcVar <= 760 && minutos-aTime/60000<2 && soundEnable)tone(tonepin,tonoActivada,largoTono);
     if( minutos-aTime/60000==0 && 59-((aTime/1000)%60) < 10)largoTono = 300;
 
-    lcd.setCursor(1,0);
-    lcd.print(DETONATION_IN);
+    lcd.setCursor(0,0);
+    lcd.print(" DETONACAO EM ");
     //Passed Time
-
+   
     lcd.setCursor(3,1);
 
     ////////HERE ARE THE TWO OPTIONS THAT ENDS THE GAME///////////
@@ -172,15 +202,15 @@ void destroy(){
     if('d' == keypad.getKey() && passwordEnable){
 
       lcd.clear();
-      lcd.setCursor(1,0);
-      lcd.print(DISARMING);
+      lcd.setCursor(0,0);
+      lcd.print("DESARMANDO BOMBA");
       delay(1000);//a little delay to think in the password
 
       lcd.clear();
-      lcd.setCursor(0,0);
-      lcd.print(ENTER_CODE);
+      lcd.setCursor(3,0);
+      lcd.print("Enter Code");
 
-      setCodeTime();// we need to set the compare variable first
+      setCode();// we need to set the compare variable first
 
       //then compare :D
 
@@ -189,7 +219,7 @@ void destroy(){
       }        
       lcd.clear();
       lcd.setCursor(3,0);
-      lcd.print(CODE_ERROR);
+      lcd.print("Code Error!");
       if(soundEnable)tone(tonepin,errorTone,200);
       delay(500);
       cls();
@@ -198,9 +228,9 @@ void destroy(){
     if(defuseando && !passwordEnable)// disarming bomb
     {
       lcd.clear();
-      digitalWrite(REDLED, LOW);  
-      lcd.setCursor(3,0);
-      lcd.print(DISARM);
+      digitalWrite(REDLED, HIGH);  
+      lcd.setCursor(0,0);
+      lcd.print(" DESARMANDO ");
       lcd.setCursor(0,1);
       unsigned int percent=0;
       unsigned long xTime=millis();
@@ -215,13 +245,13 @@ void destroy(){
         timeCalcVar=(millis()- xTime)%1000;
         if(timeCalcVar>= 0 && timeCalcVar <= 20)
         {
-          digitalWrite(GREENLED, HIGH);  
+          digitalWrite(GREENLED, LOW);  
           if(soundEnable)tone(tonepin,tonoAlarma1,200);
         }
         if(timeCalcVar >= 480 && timeCalcVar <= 500)
         {
           if(soundEnable)tone(tonepin,tonoAlarma2,200);
-          digitalWrite(GREENLED, LOW);  
+          digitalWrite(GREENLED, HIGH);  
         }
         unsigned long seconds=(millis()- xTime);
         percent= seconds/(ACTIVATESECONDS*10);
@@ -233,29 +263,9 @@ void destroy(){
           disarmedSplash();   
         }
       }
-      digitalWrite(REDLED, LOW); 
-      digitalWrite(GREENLED, LOW);
+      digitalWrite(REDLED, HIGH); 
+      digitalWrite(GREENLED, HIGH);
       cls();
     }
   }
 }
-
-void endSplash(){
-  lcd.clear();
-  while(1){
-    lcd.print(GAME_OVER);
-    lcd.setCursor(0,1);
-    lcd.print(DEFENDERS_WIN);  
-
-    for(int i = 1000; i>200; i--){
-      if(soundEnable)tone(tonepin,i);
-      delay(5);
-    }
-    noTone(tonepin);
-    delay(5000);
-    cls();
-    menuPrincipal();
-  } 
-
-}
-
