@@ -1,6 +1,7 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
+#include "lang.h"
 
 LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7,3,POSITIVE);
 
@@ -81,9 +82,9 @@ void setup(){
   //  lcd.init();                      
   //  lcd.backlight();
   lcd.setCursor(2,0);
-  lcd.print(" R E B O R N");
+  lcd.print(SPLASH_SCREEN_LINE_1);
   lcd.setCursor(1,1);
-  lcd.print(" A I R S O F T");
+  lcd.print(SPLASH_SCREEN_LINE_2);
   keypad.setHoldTime(50);
   keypad.setDebounceTime(50);
   keypad.addEventListener(keypadEvent);
@@ -210,18 +211,18 @@ void disarmedSplash(){
   if(sdStatus || saStatus){
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print("BOMBA DESARMADA");
+    lcd.print(BOMB_DISARMED);
     lcd.setCursor(0,1);
-    lcd.print(" PARABENS ");
+    lcd.print(CONGRATS);
     digitalWrite(GREENLED, LOW);  
     delay(5000);
     digitalWrite(GREENLED, HIGH); 
   }
   //end code
   lcd.clear();
-  lcd.print("Jogar outra vez?");
+  lcd.print(PLAY_AGAIN);
   lcd.setCursor(0,1);
-  lcd.print("A: SIM  B: NAO");
+  lcd.print(YES_OR_NOT);
   digitalWrite(REDLED, HIGH);  
   digitalWrite(GREENLED, HIGH); 
   while(1)
@@ -256,9 +257,9 @@ void explodeSplash(){
   delay(100);
   endGame = false;
   lcd.setCursor(1,0);
-  lcd.print("TERRORISTAS WIN");
+  lcd.print(TERRORISTS_WIN);
   lcd.setCursor(0,1);
-  lcd.print("  FIM DE JOGO");
+  lcd.print(GAME_OVER);
   for(int i = 200; i>0; i--)// 
   {
     tone(tonepin,i);
@@ -272,9 +273,9 @@ void explodeSplash(){
   cls();
 
   //end code
-  lcd.print("Jogar outra vez?");
+  lcd.print(PLAY_AGAIN);
   lcd.setCursor(0,1);
-  lcd.print("A: SIM  B: NAO");
+  lcd.print(YES_OR_NOT);
   while(1)
   {
     var = keypad.waitForKey();

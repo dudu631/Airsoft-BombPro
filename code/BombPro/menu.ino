@@ -7,8 +7,7 @@ void menuPrincipal(){   //MAIN MENU
   //Draw menu
   cls();//clear lcd and set cursor to 0,0
   int i=0;
-  char* menu1[]={
-    "Search&Destroy","Sabotage","Domination", "Bomb Setup"        }; // HERE YOU CAN ADD MORE ITEMS ON THE MAIN MENU
+  
   lcd.print(menu1[i]);
   lcd.setCursor(15,1);
   checkArrows(i,2);
